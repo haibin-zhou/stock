@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.koder.stock.coreservice.domain.mapper.StockTradeOrderDOMapper">
+
+    <resultMap id="baseResult" type="com.koder.stock.coreservice.domain.dataobject.StockTradeOrderDO">
+        <result property="id" column="id"/>
+        <result property="features" column="features"/>
+        <result property="modifiedTime" column="modified_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="status" column="status"/>
+        <result property="userId" column="user_id"/>
+        <result property="tradeOrderNo" column="trade_order_no"/>
+        <result property="stockCode" column="stock_code"/>
+        <result property="entrustCount" column="entrust_count"/>
+        <result property="exchangeType" column="exchange_type"/>
+        <result property="entrustPrice" column="entrust_price"/>
+        <result property="entrustBs" column="entrust_bs"/>
+        <result property="entrustType" column="entrust_type"/>
+        <result property="exchange" column="exchange"/>
+        <result property="tradeWhenClose" column="trade_when_close"/>
+        <result property="iceBergDisplaySize" column="ice_berg_display_size"/>
+        <result property="strategyType" column="strategy_type"/>
+
+        <result property="dealPrice" column="deal_price"/>
+        <result property="dealCount" column="deal_count"/>
+        <result property="dealDateTime" column="deal_date_time"/>
+        <result property="outerTradeNo" column="outer_trade_no"/>
+        <result property="strategyId" column="strategy_id"/>
+        <result property="reCreate" column="re_create"/>
+    </resultMap>
+
+    <sql id="table_name">
+        stock_trade_order
+    </sql>
+
+    <sql id="all_columns">
+        id,features,modified_time,create_time,status,user_id,trade_order_no,entrust_count,stock_code,exchange_type,entrust_price,entrust_bs,entrust_type,exchange,trade_when_close,ice_berg_display_size,strategy_type,strategy_id,re_create
+    </sql>
+
+    <insert id="batchAdd">
+        insert into stock_trade_order(features,modified_time,create_time,status,user_id,trade_order_no,entrust_count,stock_code,exchange_type,entrust_price,entrust_bs,entrust_type,exchange,trade_when_close,ice_berg_display_size,strategy_type,strategy_id,re_create)
+        values
+        <foreach collection="tradeOrders" item="order" separator="),(" open="(" close=")">
+            #{order.features},#{order.modifiedTime},#{order.createTime},#{order.status},#{order.userId},
+            #{order.tradeOrderNo},#{order.entrustCount},#{order.stockCode},#{order.exchangeType},#{order.entrustPrice},
+            #{order.entrustBs},#{order.entrustType},#{order.exchange},#{order.tradeWhenClose},
+            #{order.iceBergDisplaySize},#{order.strategyType},#{order.strategyId},#{order.reCreate}
+        </foreach>
+    </insert>
+
+    <select id="queryUserOrdersByStatus" resultMap="baseResult" parameterType="map">
+        select
+            <include refid="all_columns" />
+         from
+            <include refid="table_name"/>
+        where
+            stock_code = #{stockCode}
+        and user_id = #{userId}
+        and status in
+        <foreach collection="statusList" open="(" close=")" separator="," item="status">
+            #{status}
+        </foreach>
+    </select>
+
+    <select id="queryReCreateOrder" resultMap="baseResult" parameterType="map">
+        select
+            <include refid="all_columns" />
+        from
+            <include refid="table_name"/>
+        where
+            exchange_type = #{market}
+            and re_create='WAIT_RE_CREATE'
+            and status in('9','6')
+    </select>
+
+    <select id="queryOrderByTradeNo" resultMap="baseResult" parameterType="map">
+        select
+        <include refid="all_columns" />
+        from
+        <include refid="table_name"/>
+        where
+            trade_order_no = #{tradeOrderNo}
+    </select>
+
+    <select id="queryOrderById" resultMap="baseResult" parameterType="map">
+        select
+            <include refid="all_columns" />
+        from
+            <include refid="table_name"/>
+        where
+            id = #{id}
+    </select>
+
+    <select id="queryOrderByOuterTradeNo" resultMap="baseResult" parameterType="map">
+        select
+            <include refid="all_columns" />
+        from
+            <include refid="table_name"/>
+        where
+            outer_trade_no = #{outTradeOrderNo}
+    </select>
+
+    <update id="updateEntrustStatus" parameterType="map">
+        update
+            <include refid="table_name"/>
+        set
+            status=#{status},
+            outer_trade_no=#{outerTradeNo},
+            features=#{features}
+        where
+            id=#{orderId}
+    </update>
+
+    <update id="updateEntrustCallback">
+        update
+            <include refid="table_name"/>
+        set
+            status=#{stockTradeOrderDO.status},
+            deal_count=#{stockTradeOrderDO.dealCount},
+            deal_price=#{stockTradeOrderDO.dealPrice},
+            deal_date_time=#{stockTradeOrderDO.dealDateTime},
+            features=#{stockTradeOrderDO.features}
+        where
+            id=#{stockTradeOrderDO.id}
+    </update>
+
+    <update id="updateReCreatedStatus">
+        update
+            <include refid="table_name"/>
+        set
+            re_create=#{toStatus}
+        where
+            id in
+        <foreach collection="idList" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+          and re_create=#{fromStatus}
+    </update>
+
+
+</mapper>

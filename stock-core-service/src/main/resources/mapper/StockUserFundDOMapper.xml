@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.koder.stock.coreservice.domain.mapper.StockUserFundDOMapper">
+
+    <resultMap id="baseResult" type="com.koder.stock.coreservice.domain.dataobject.StockUserFundDO">
+        <result property="id" column="id"/>
+        <result property="modifiedTime" column="modified_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="userId" column="user_id"/>
+        <result property="availableBalance" column="available_balance"/>
+        <result property="assetBalance" column="asset_balance"/>
+        <result property="holdingBalance" column="holding_balance"/>
+        <result property="exchangeType" column="exchange_type"/>
+        <result property="assetDate" column="asset_date"/>
+    </resultMap>
+
+    <sql id="table_name">
+        stock_user_fund
+    </sql>
+
+    <sql id="all_columns">
+        id,modified_time,create_time,exchange_type,available_balance,asset_balance,holding_balance,asset_date,user_id
+    </sql>
+
+    <insert id="add" keyProperty="id" useGeneratedKeys="true">
+        insert into stock_user_fund (modified_time,create_time,exchange_type,available_balance,asset_balance,holding_balance,asset_date,user_id)
+        values(#{fund.modifiedTime},#{fund.createTime},#{fund.exchangeType},#{fund.availableBalance},#{fund.assetBalance},#{fund.holdingBalance},#{fund.assetDate},#{fund.userId})
+    </insert>
+</mapper>

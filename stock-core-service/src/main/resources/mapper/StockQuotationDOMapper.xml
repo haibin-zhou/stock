@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.koder.stock.coreservice.domain.mapper.StockQuotationDOMapper">
+
+    <resultMap id="baseResult" type="com.koder.stock.coreservice.domain.dataobject.StockQuotationDO">
+        <result property="id" column="id"/>
+        <result property="modifiedTime" column="modified_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="code" column="code"/>
+        <result property="quotationTime" column="quotation_time"/>
+        <result property="stockId" column="stock_id"/>
+        <result property="lastClosingPrice" column="last_closing_price"/>
+        <result property="closingPrice" column="closing_price"/>
+        <result property="openingPrice" column="opening_price"/>
+        <result property="highestPrice" column="highest_price"/>
+        <result property="lowestPrice" column="lowest_price"/>
+        <result property="changeAmount" column="change_amount"/>
+        <result property="changeRange" column="change_range"/>
+        <result property="turnOverRate" column="turn_over_rate"/>
+        <result property="turnOverVolume" column="turn_over_volume"/>
+        <result property="turnOverAmount" column="turn_over_amount"/>
+    </resultMap>
+
+    <sql id="table_name">
+        stock_quotation
+    </sql>
+
+    <sql id="all_columns">
+        id,modified_time,create_time,quotation_time,code,stock_id,last_closing_price,closing_price,opening_price,highest_price,lowest_price,change_amount,change_range,turn_over_rate,turn_over_volume
+    </sql>
+
+    <insert id="batchInsert">
+        insert into stock_quotation(
+            modified_time,
+            create_time,
+            quotation_time,
+            code,
+            stock_id,
+            last_closing_price,
+            closing_price,
+            opening_price,
+            highest_price,
+            lowest_price,
+            change_amount,
+            change_range,
+            turn_over_rate,
+            turn_over_volume,
+            turn_over_amount)
+        values
+        <foreach collection="quotations" separator="),(" open="(" item="quotation" close=")">
+            #{quotation.modifiedTime},
+            #{quotation.createTime},
+            #{quotation.quotationTime},
+            #{quotation.code},
+            #{quotation.stockId},
+            #{quotation.lastClosingPrice},
+            #{quotation.closingPrice},
+            #{quotation.openingPrice},
+            #{quotation.highestPrice},
+            #{quotation.lowestPrice},
+            #{quotation.changeAmount},
+            #{quotation.changeRange},
+            #{quotation.turnOverRate},
+            #{quotation.turnOverVolume},
+            #{quotation.turnOverAmount}
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        code=VALUES(stock_id),quotation_time=VALUES(quotation_time)
+    </insert>
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.koder.stock.coreservice.domain.mapper.StockTradeStrategyDOMapper">
+
+    <resultMap id="baseResult" type="com.koder.stock.coreservice.domain.dataobject.StockTradeStrategyDO">
+        <result property="id" column="id"/>
+        <result property="features" column="features"/>
+        <result property="modifiedTime" column="modified_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="status" column="status"/>
+        <result property="userId" column="user_id"/>
+        <result property="stockId" column="stock_id"/>
+        <result property="strategyType" column="strategy_type"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="strategyContent" column="strategy_content"/>
+    </resultMap>
+
+    <sql id="table_name">
+        stock_trade_strategy
+    </sql>
+
+    <sql id="all_columns">
+        id,features,modified_time,create_time,status,user_id,stock_id,strategy_type,start_time,end_time,strategy_content
+    </sql>
+
+    <insert id="batchAdd">
+        insert into stock_trade_strategy(features,modified_time,create_time,status,user_id,stock_id,strategy_type,start_time,end_time,strategy_content)
+        values
+        <foreach collection="strategies" item="strategy" separator=")(" open="(" close=")">
+            #{strategy.features},#{strategy.modifiedTime},#{strategy.createTime},1,#{strategy.userId},
+            #{strategy.stockId},#{strategy.strategyType},#{strategy.startTime},1,#{strategy.endTime},#{strategy.strategyContent}
+        </foreach>
+    </insert>
+
+    <select id="queryStrategyByStockId" resultMap="baseResult" parameterType="map">
+        select
+            <include refid="all_columns" />
+         from
+            <include refid="table_name"/>
+        where
+            stock_id = #{stockId}
+        and status=1
+    </select>
+
+    <select id="queryStrategyById" resultMap="baseResult" parameterType="map">
+        select
+            <include refid="all_columns" />
+        from
+            <include refid="table_name"/>
+        where
+            id = #{id}
+    </select>
+
+</mapper>
